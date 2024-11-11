@@ -1,0 +1,113 @@
+---
+title: "data exploration"
+format: html
+editor: visual
+---
+
+# Data Exploration
+
+The variables I need to look at to answer my questions are DO_percent, Month, and pH
+
+Normal Set Up
+
+```{r}
+rm(list = ls()) #clears R's brain
+#Load in packages with the functions I need
+library(tidyverse)
+library(here)
+library(ggfortify)
+```
+
+Read in the data
+
+```{r}
+hlab <- read.csv(here("Data", "HydroLabData.csv"))
+#look at the data
+glimpse(hlab)
+#don't know what's up with the extra columns so I'll just get rid of them 
+hlab1 <- select(hlab, -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9, -X.10, -X.11 )
+glimpse(hlab1)
+  
+```
+
+Looks like I have 1635 rows and 12 variables. I need to change native_or_chestnut, season, site, and month into factor variables.
+
+## Check for mistakes
+
+```{r}
+hlab1$Month <- as.factor(hlab1$Month)
+levels(hlab1$Month)
+```
+
+Looks good! There are no typos or errors in the Month column.
+
+## Check for outliers
+
+```{r}
+# check DO_percent by visualizing the data
+hlab1 |>
+  ggplot(aes(Month, DO_percent)) + 
+  geom_boxplot(outlier.color = "red") + 
+  theme_bw()
+```
+
+There are some really high values in September, but I know that the hydrolab that was used to get this data was calibrated and acclimatized so I don't feel its necessary to remove them.
+
+```{r}
+#check pH by visualizing the data
+hlab1 |>
+  ggplot(aes(Month, pH)) + 
+  geom_boxplot(outlier.color = "red") + 
+  theme_bw()
+```
+
+There are a few outliers. I'm confident that its due to the actual conditions in the river and not error in the data collection, so there is no reason to get rid of them.
+
+Everything looks good with the data, so I can save the cleaned up data set in my Data folder.
+
+```{r}
+write.csv(hlab1, here("Data", "hlab1.csv"), row.names = FALSE)
+# now read it in
+hlab <- read.csv(here("Data", "hlab1.csv"))
+#refactor the data
+hlab$Month <- as.factor(hlab$Month)
+```
+
+## Exploratory Data Analysis
+
+Looking at DO_percent and Month
+
+```{r}
+#visualize the data
+ggplot(hlab, aes(x = Month, y = DO_percent)) + 
+  geom_boxplot() + 
+  theme_bw()
+```
+
+```{r}
+#Now get some summary statistics
+hlab |> 
+  group_by(Month) |> 
+  summarise(mean.DO = mean(DO_percent),
+            sd.DO = sd(DO_percent)) |> 
+  View()
+```
+
+Looks like there might be a difference between the average DO% in June and in the other months, and a difference between the average DO% in September and the other months
+
+Now look at DO_percent and pH
+
+```{r}
+#Visialize the data
+ggplot(hlab, aes(x = DO_percent, y = pH)) + 
+  geom_point() + 
+  theme_bw()
+```
+
+Estimate slope and intercept:
+
+Looks like the slope is positive. Difference in pH: 8.4-6.8=1.6
+
+Difference in DO% : 156-0=156
+
+So the slope = 1.6/156 = 0.0103 and I would estimate the intercept to be at about 6.3
