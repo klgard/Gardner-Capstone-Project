@@ -1,0 +1,14 @@
+---
+title: "data-exploration-feedback"
+format: html
+editor: visual
+---
+
+## Date Exploration Feedback
+
+1.  when I read in hlab, I get 12 extra columns named X through X.11 that are all NA. Why is this the case? I see that you fixed them, but do you know why they are there? Also, to keep your environment decluttered, you could just resave hlab as hlab after you drop those columns instead of as hlab1.
+2.  At line 66 you say "Everything looks good with the data" and, while I don't disagree, I'd like to see you make histograms of any of the continuous variables you will be using so that you can get a visual of the distribution of the data.
+3.  I'd like you to continue working on commenting your code. For example, when you run lines 80 - 85, what do you learn from looking at the plot? I need to be able to follow your train of thought as I work through your code, and I can't do that very well without more commentary.
+4.  Is there a scientific reason that might help explain why average Do might be difference in June and Sept vs other months?
+
+Overall, this is good. See above about histograms though.
