@@ -24,8 +24,8 @@ Read in the data
 hlab <- read.csv(here("Data", "HydroLabData.csv"))
 #look at the data
 glimpse(hlab)
-#don't know what's up with the extra columns so I'll just get rid of them 
-hlab1 <- select(hlab, -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9, -X.10, -X.11 )
+#don't know what's up with the extra columns so I'll just get rid of them, as well as the last row that 
+hlab1 <- select(hlab, -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9, -X.10, -X.11 ) |> slice(-1715)
 glimpse(hlab1)
   
 ```
