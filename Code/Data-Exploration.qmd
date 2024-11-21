@@ -25,8 +25,8 @@ hlab <- read.csv(here("Data", "HydroLabData.csv"))
 #look at the data
 glimpse(hlab)
 #don't know what's up with the extra columns so I'll just get rid of them, as well as the last row that 
-hlab1 <- select(hlab, -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9, -X.10, -X.11 ) |> slice(-1715)
-glimpse(hlab1)
+hlab <- select(hlab, -X, -X.1, -X.2, -X.3, -X.4, -X.5, -X.6, -X.7, -X.8, -X.9, -X.10, -X.11 ) |> slice(-1715)
+glimpse(hlab)
   
 ```
 
@@ -35,8 +35,8 @@ Looks like I have 1635 rows and 12 variables. I need to change native_or_chestnu
 ## Check for mistakes
 
 ```{r}
-hlab1$Month <- as.factor(hlab1$Month)
-levels(hlab1$Month)
+hlab$Month <- as.factor(hlab$Month)
+levels(hlab$Month)
 ```
 
 Looks good! There are no typos or errors in the Month column.
@@ -45,7 +45,7 @@ Looks good! There are no typos or errors in the Month column.
 
 ```{r}
 # check DO_percent by visualizing the data
-hlab1 |>
+hlab |>
   ggplot(aes(Month, DO_percent)) + 
   geom_boxplot(outlier.color = "red") + 
   theme_bw()
@@ -55,7 +55,7 @@ There are some really high values in September, but I know that the hydrolab tha
 
 ```{r}
 #check pH by visualizing the data
-hlab1 |>
+hlab |>
   ggplot(aes(Month, pH)) + 
   geom_boxplot(outlier.color = "red") + 
   theme_bw()
@@ -66,7 +66,7 @@ There are a few outliers. I'm confident that its due to the actual conditions in
 Everything looks good with the data, so I can save the cleaned up data set in my Data folder.
 
 ```{r}
-write.csv(hlab1, here("Data", "hlab1.csv"), row.names = FALSE)
+write.csv(hlab, here("Data", "hlab.csv"), row.names = FALSE)
 # now read it in
 hlab <- read.csv(here("Data", "hlab1.csv"))
 #refactor the data

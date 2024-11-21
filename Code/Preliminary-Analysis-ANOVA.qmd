@@ -1,0 +1,95 @@
+---
+title: "Preliminary Data Analysis"
+format: html
+editor: visual
+---
+
+# CAP DAP Preliminary Data Analysis: ANOVA
+
+Explantation
+
+Set up code
+
+```{r}
+rm(list = ls())
+library(here)
+library(tidyverse)
+library(ggfortify)
+library(gridExtra)
+library(multcomp)
+
+# read in the data
+hlab <- read.csv(here("data", "hlab.csv"))
+```
+
+Make month a factor variable
+
+```{r}
+hlab$Month <- as.factor(hlab$Month)
+levels(hlab$Month). # take a look at the levels to triple check that there are no errors
+```
+
+Make a histogram
+
+```{r}
+ggplot(hlab, aes(x = DO_mgl)) +
+  geom_histogram(bins = 30) + 
+  facet_wrap(~Month) + # look at DO by month
+  theme_bw()
+```
+
+I think I'm going to switch the variable I use for the ANOVA to use DO_mgl, or dissolved oxygen measured in milligrams per liter because the measurements in percent go up to 150% which isn't really possible. The DO measured in mg/l stays within physically possible ranges.
+
+Make the model
+
+```{r}
+anova_mod <- lm(DO_mgl ~ Month, data = hlab) #Month to predict DO
+```
+
+Check Assumptions again because I'm using a slightly different variable
+
+```{r}
+autoplot(anova_mod)
+```
+
+I think its okay?
+
+Run anova
+
+```{r}
+anova(anova_mod)
+```
+
+**There is some significant difference in the dissolved oxygen between months (F = 120.6, p \<2.2e-16).**
+
+Summary Table
+
+```{r}
+summary(anova_mod)
+```
+
+Tukey HSD
+
+```{r}
+phc1 <- glht(anova_mod, linfct = mcp(Month = "Tukey"))
+cld(phc1) # went right to the compact letter display because it's way easier to read
+```
+
+Looks like there is a significant difference between July and the other months, and October and the other months. There is no significant difference between June and September.
+
+Replot the data
+
+```{r}
+ggplot(hlab, aes(x = Month, y = DO_mgl, fill = Month)) + 
+  geom_boxplot() +
+  theme_bw() + 
+  theme(legend.position = "none", 
+        panel.grid = element_blank()) + 
+  scale_fill_manual(values = c(July = "purple", 
+                               June = "cornflowerblue", 
+                               October = "orange", 
+                               September = "cornflowerblue" )) + 
+  ylab("Dissolved Oxygen (mg/l)")
+
+#Changed colors based on which groups were different from each other
+```

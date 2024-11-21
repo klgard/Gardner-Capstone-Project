@@ -1,0 +1,58 @@
+---
+title: "Preliminary Data Analysis"
+author: "Kate Gardner"
+format: html
+editor: visual
+---
+
+## CAP DAP Preliminary Data Analysis: Linear Regression
+
+This .qmd file has the preliminary linear regression testing for a relationship between dissolved oxygen (`DO_percent`) and pH (`pH`).
+
+Normal code set up
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(here)
+library(ggfortify)
+library(gridExtra)
+
+#read in the data
+hlab <- read.csv(here("Data", "hlab.csv"))
+```
+
+Since I already visualized and guessed at the results, I'll jump right to building my model
+
+```{r}
+hlab_mod <- lm(pH ~ DO_percent, data = hlab)
+```
+
+Now check assumptions
+
+```{r}
+autoplot(hlab_mod)
+```
+
+I think its okay?
+
+Run linear regression test
+
+```{r}
+anova(hlab_mod)
+```
+
+```{r}
+summary(hlab_mod)
+```
+
+There is a significant relationship between pH and DO (F = 684, p \<2.2e-16)
+
+Replot the data
+
+```{r}
+ggplot(hlab, aes(x = DO_percent, y = pH, color = Native_or_chestnut)) + 
+  geom_point() +
+  labs(x = "Dissolved Oxygen (%)", y = "pH") + 
+  scale_color_manual(values = c(native = "darkgreen", chestnut = "red"))       # showing chestnut and native for funsies
+```
