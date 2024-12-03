@@ -1,0 +1,54 @@
+---
+title: "prelim analysis feedback"
+format: html
+editor: visual
+---
+
+## Preliminary Analysis Feedback
+
+### General
+
+Overall this is a good job. Please work on fleshing out detail in the commentary and making explicit your null and alternative hypotheses for each analysis, along with biological justification.
+
+### ANOVA
+
+Line 28 - You should figure out how to make month an *ordered* factor, since the months have an order relative to one another. That way, they will print and be related to one another in calendar rather than alphabetical order.
+
+Line 34 - If you add one argument to your facet_wrap statement, you can see all of the plots on top of one another which will help you look to see if the means might be different.
+
+```{r}
+ggplot(hlab, aes(x = DO_mgl)) +
+  geom_histogram(bins = 30) + 
+  facet_wrap(~Month, ncol = 1) + # look at DO by month
+  theme_bw()
+```
+
+Line 41 - Before you dig in on the ANOVA, I'd like you to make a statement about a null and alternative hypotheses with some indication of an expectation, based on biologically meaningful insight. Why should DO change with season?
+
+Also, what would a preliminary plot look like that takes into accout mean DO values (hint: group_by and summarise) and then guesstimate the means for each group.
+
+Line 55 - Your autoplot is ok, but not great. When you look at your histograms, you see that in July and September there is a long left-skew to the data - I think that is why things look a bit strange. You can consider a glm approach and see if it gives you a better fit. We'll talk about that in class.
+
+Also, in your final draft, I don't want you to pose your evaluation of autoplot as a question, but instead tell me more details about how you are interpreting it.
+
+Line 70 - what did you learn from `summary()`?
+
+Final plot - I like your idea of using color to show which are significantly different, but remember that people with visual impairments may not be able to make sense of that, so also consider using annotate() to add letters to your plot.
+
+I don't think a boxplot is the best representation of your results, however. Take a look at the book and see what it uses (fig 5.11) for a plot showing results of an ANOVA. The analysis compares means between groups, so you ought to have the means in your plot and will likely need group_by and summarise to get the best plot.
+
+I'd like to have a clean, clear results statement that includes the overall anova as well as tukey results all in one place, including relevant test statistics, etc. And try to make your statement in terms of the direction of the difference, not just that there is a significant different. And then I'd like some biological interpretation. Does it make sense that DO is highest in October and lowest in July? Why or why not?
+
+### Linear Regression
+
+Line 25 - please put the visualization and guessing of the results in this .qmd file.
+
+Line 37 - Again, be declarative and tell me how you are interpreting the figures, rather than asking a question.
+
+Line 49 - With linear regression, we are also interested in the adjusted R2 value; you should also be reporting it and interpreting it, as well as the slope.
+
+Ah ha! You added chestnut and native for fun - and that is fine, except that for the reader, we are then expecting to see 2 regression lines, one for each cloud of points. If you want to have a section in which you do some exploratory plotting w/out analysis and add a plot like that, fine, but please don't have it as the final figure for this analysis. Also, look back to chapter 5 at how to plot the regression line with confidence interval (hint: geom_smooth) to add to your plot.
+
+### Time series?
+
+You don't have this, but I'd like to suggest that you think about doing a time series, using the code I have provided in the Cap-DAP-Example git hub repot, and learn how to plot a moving average for DO or pH or something over time. I think that would be pretty neat.

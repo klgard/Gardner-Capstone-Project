@@ -26,7 +26,7 @@ Make month a factor variable
 
 ```{r}
 hlab$Month <- as.factor(hlab$Month)
-levels(hlab$Month). # take a look at the levels to triple check that there are no errors
+levels(hlab$Month) # take a look at the levels to triple check that there are no errors
 ```
 
 Make a histogram
