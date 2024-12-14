@@ -1,6 +1,6 @@
 
 
-This dataset was created by Kate Gardner on October 24, 2024. It includes data collected from October 4 to October 11, 2024 and September 4 to September 9, 2024 in the Oswegatchie River in Heuvelton, New York. The data includes informaton about the underwater envitonmental conditions in sites consisting of mostly native plant species and sites consisting of mostly invasive water chestnut. 
+This dataset was created by Kate Gardner on October 24, 2024. It includes data collected from October 4 to October 11, 2024 and September 4 to September 9, 2024 in the Oswegatchie River in Heuvelton, New York. The data includes information about the underwater environmental conditions in sites consisting of mostly native plant species and sites consisting of mostly invasive water chestnut. 
 
 Key: 
 Date: (interval) date that the reading was taken
@@ -11,9 +11,9 @@ Site: (nominal) the site ID number where the data was collected
 Native_or_Chestnut: (binary) indicates if the site has mostly native plants or water chestnut
 Temp: (interval) the water temperature 
 pH: (interval) the pH of the water
-SpCond_uscm: (ratio) specific conduntivity
+SpCond_uscm: (ratio) specific conductivity
 DO_percent:(ratio) percent dissolved oxygen in the water
 DO_mgl: (ratio) dissolved oxygen in miligrams per liter
 CHL_ugl: (ratio) measure of chlorophyll A in the water
 
-The only changes made to the datasets were combinig them and separating the date&time column to two seperate date and time columns. 
+The only changes made to the datasets were combining them and separating the date&time column to two separate date and time columns. 
