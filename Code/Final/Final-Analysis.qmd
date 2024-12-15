@@ -8,6 +8,173 @@ editor: visual
 
 ## Introduction
 
-## Analysis
+This data set was created by Kate Gardner on October 24, 2024. It includes data collected from 6/3/2024-6/7/2024, 7/18/2024-7/24/2024, 9/4/2024-9/9/2024, and 10/4/2024-10/12/2024, 9/4/24-9/9/24 in the Oswegatchie River in Heuvelton, New York. It consists of 1714 observations of 12 variables (Date, Time, Month, Season, Site, Native_or_chestnut, Temp, pH, SpCond_usm, DO_percent, DO_mgl, and CHL_ugl). The data includes information about the underwater environmental conditions in sites consisting of mostly native plant species and sites consisting of mostly invasive water chestnut. The invasion of water chestnut in the Oswegatchie is relatively recent, and has yet to seriously spread beyond Heuvelton. If it is allowed to spread downstream unchecked, it could negatively impact the environmentally and economically important ecosystem of the St. Lawrence River. This data was collected as the beginning stages of a two-year grant designed to control and study the water chestnut population in the Oswegatchie River.
 
-## Challenges
+# Analysis
+
+Start with the normal code set up
+
+```{r}
+rm(list = ls()) #clear environment
+
+#Load in the necessary packages
+library(here)
+library(tidyverse)
+library(ggfortify)
+library(gridExtra)
+library(multcomp)
+```
+
+Now, read in the data
+
+```{r}
+hlab <- read.csv(here("data","Final Data", "hlab.csv"))
+```
+
+Make `Month` an ordered factor
+
+```{r}
+hlab$Month <- as.factor(hlab$Month)
+hlab$Month <- factor(hlab$Month, ordered = TRUE, levels = c("June", "July", "September", "October"))
+levels(hlab$Month)
+```
+
+## ANOVA: Testing for a difference in mean dissolved oxygen between months
+
+Dissolved oxygen: DO_mgl (ratio)
+
+Month: Month (nominal data)
+
+Null hypothesis: There is no statistically significant difference in mean dissolved oxygen between months.
+
+Alternative hypothesis: Dissolved oxygen will decrease significantly over the months.
+
+I would expect to find a difference in dissolved oxygen by month because as photosynthesis should be at a peak because that is the time of year that New York has the most hours of sunlight, as well as the strongest sunlight. Also, as time progresses and the weather starts to get colder and plants start dying, they will not be doing as much photosynthesis and more respiration will be required for decomposition (source).
+
+```{r}
+#Make a histogram to visualize the data
+
+ggplot(hlab, aes(x = DO_mgl)) +
+  geom_histogram(bins = 40) + 
+  facet_wrap(~Month, ncol = 1) + # look at DO by month
+  theme_bw()
+
+# Get summary statistics
+hlab |> 
+  group_by(Month) |>
+  summarise(mean_do = mean(DO_mgl), 
+            sd_do = sd(DO_mgl))
+
+```
+
+It looks like the mean DO will be higher in October than the other months.
+
+Next step is to make the model
+
+```{r}
+anova_mod <- lm(DO_mgl ~ Month, data = hlab) #Month to predict DO
+
+anova_glm <- glm(DO_mgl ~ Month, data = hlab)
+```
+
+Check assumptions
+
+```{r}
+autoplot(anova_glm)
+```
+
+The normal Q-Q plot looks a little funky towards the bottom, but that could
+
+Get the ANOVA and summary tables
+
+```{r}
+anova(anova_glm, test = "Chisq")
+```
+
+Interpretation:
+
+```{r}
+summary(anova_glm)
+```
+
+Interpretation:
+
+Post hoc?
+
+Graph ?
+
+Final interpretation with biological justification
+
+## Linear Regression: Testing for a relationship between Dissolved oxygen and pH
+
+DO_mgl: (ratio) dissolved oxygen in milligrams per liter
+
+pH: (interval) pH level in the water
+
+Null hypothesis: pH does not change with percent dissolved oxygen.
+
+Alternative hypothesis: pH will increase as dissolved oxygen increases.
+
+Justification:
+
+Visualize and Estimate Results
+
+```{r}
+ggplot(hlab, aes(x = DO_mgl, y = pH)) + 
+  geom_point() + 
+  theme_bw()
+```
+
+```{r}
+#slope calculations
+y <- 8.3-6.4
+x <- 155
+y/x
+```
+
+Intercept Estimate: 6.6
+
+Make the model
+
+```{r}
+hlab_mod <- lm(pH ~ DO_mgl, data = hlab)
+```
+
+Check Assumptions
+
+```{r}
+autoplot(hlab_mod)
+```
+
+The original model used DO_percent to run the regression, however after switching to DO_mgl, the assumptions are not perfect, but it looks better.
+
+Get ANOVA and summary tables
+
+```{r}
+anova(hlab_mod)
+```
+
+```{r}
+summary(hlab_mod)
+```
+
+The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p \<2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality.
+
+Final plot
+
+```{r}
+ggplot(hlab, aes(x = DO_percent, y = pH)) + 
+  geom_point() +
+  labs(x = "Dissolved Oxygen (%)", y = "pH") + 
+  geom_smooth(method = "lm") + 
+  theme_bw()
+  
+```
+
+# Challenges
+
+1.  getting the glm() to work. The first time I tried to run it it gave me this crazy warning message (Warning in dpois(y, mu, log = TRUE) : non-integer x = 1.140000) and I figured out that it gave me that because I was trying to use the poisson distribution with a predictor variable that is not whole numbers. I'm still not sure which distribution I'm supposed to be using.
+2.  getting my data set up for this. holy cow the original data sets were all in different spreadsheets and I had to go through them all and manually separate out the date and time columns that were originally lumped together because the hydrolab we used exports the data in a weird way.
+3.  Unfortunately, as much as I would have liked to run a time series analysis for dissolved oxygen and month, I chose not to so that I don't go crazy.
+
+## Work Cited
