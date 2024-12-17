@@ -49,7 +49,7 @@ Null hypothesis: There is no statistically significant difference in mean dissol
 
 Alternative hypothesis: Dissolved oxygen will decrease significantly over the months.
 
-I would expect to find a difference in dissolved oxygen by month because as photosynthesis should be at a peak because that is the time of year that New York has the most hours of sunlight, as well as the strongest sunlight. Also, as time progresses and the weather starts to get colder and plants start dying, they will not be doing as much photosynthesis and more respiration will be required for decomposition (source).
+I would expect to find a difference in dissolved oxygen by month because as photosynthesis should be at a peak because that is the time of year that New York has the most hours of sunlight, as well as the strongest sunlight. Also, as time progresses and the weather starts to get colder and plants start dying, they will not be doing as much photosynthesis and more respiration will be required for decomposition. Because of the water chestnut in the area providing more biomass, I would expect there to be higher rates of decomposition as it dies off (Heller, 2020).
 
 ```{r}
 #Make a histogram to visualize the data
@@ -72,8 +72,6 @@ It looks like the mean DO will be higher in October than the other months.
 Next step is to make the model
 
 ```{r}
-anova_mod <- lm(DO_mgl ~ Month, data = hlab) #Month to predict DO
-
 anova_glm <- glm(DO_mgl ~ Month, data = hlab)
 ```
 
@@ -82,8 +80,7 @@ Check assumptions
 ```{r}
 autoplot(anova_glm)
 ```
-
-The normal Q-Q plot looks a little funky towards the bottom, but that could
+The normal Q-Q plot looks a little funky towards the bottom, but that could still be due to the left skew in some of the data.
 
 Get the ANOVA and summary tables
 
@@ -91,19 +88,39 @@ Get the ANOVA and summary tables
 anova(anova_glm, test = "Chisq")
 ```
 
-Interpretation:
-
 ```{r}
 summary(anova_glm)
 ```
+Based on the ANOVA, a little less than half of the variance in the data is explained by month. The intercept is 6.040, which biologically makes sense because its on the lower end of what we measured. However, the residual deviance in the summary table is relatively high aligning with the fact that not much of the. variation in the data is explained by month. We do have some sort of significant difference between months, so I need to run a Tukey HSD test. 
 
-Interpretation:
+Tukey HSD
+```{r}
+phc1 <- glht(anova_glm, linfct = mcp(Month = "Tukey"))
+cld(phc1) # went right to the compact letter display because it's way easier to read
+```
+According to the Tukey test, dissolved oxygen in October is significantly higher than in the earlier months, opposite of what I predicted. Also, July is significantly lower than June, September, and October and there is no significant difference between June and September. The sampling rate and duration increased in September and October, which could have contributed to the higher DO in October. I believe that more consistent sampling methods over a longer period of time would show the expected results. 
+Another explanation for the unexpected results could be that removing most of the water chestnut in July and August had a significant impact on the dissolved oxygen concentration in the water. It could be that we saw higher dissolved oxygen concentrations in October because it was the farthest from when most of the chestnut was removed. 
 
-Post hoc?
+Final Graph 
+```{r}
+ggplot(hlab, aes(x = Month, y = DO_mgl, color = Month)) + 
+  geom_point(size = 1, alpha = 0.5) + 
+  labs( x = "Month", y = "Dissolved Oxygen (mg/l)") + 
+  coord_flip() +
+  theme(panel.grid = element_blank(), 
+        legend.position = "none") + 
+  scale_color_manual(values = c(July = "purple", 
+                               June = "cornflowerblue", 
+                               October = "orange", 
+                               September = "cornflowerblue" )) + 
+  theme_bw() + 
+  stat_summary(geom = "point", fun = "mean", col = "black", size = 5, shape = 23,
+               fill = "red") +
+  annotate("text", y = c(5.99, 5.17, 5.66, 7.32), x = c("June", "July", "September",
+                                                   "October"), 
+           label = c("a", "b", "a", "c"))
+```
 
-Graph ?
-
-Final interpretation with biological justification
 
 ## Linear Regression: Testing for a relationship between Dissolved oxygen and pH
 
@@ -115,7 +132,7 @@ Null hypothesis: pH does not change with percent dissolved oxygen.
 
 Alternative hypothesis: pH will increase as dissolved oxygen increases.
 
-Justification:
+I would expect to find that pH increases as dissolved oxygen increases. When respiration rates are low, using less dissolved oxygen, there is also less CO2 being released into the water that can react and become carbonic acid, lowering pH (Fondriest Environmental Inc., 2013).
 
 Visualize and Estimate Results
 
@@ -158,7 +175,7 @@ anova(hlab_mod)
 summary(hlab_mod)
 ```
 
-The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p \<2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality.
+The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p \<2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality (Fondriest Environmental Inc., 2013).
 
 Final plot
 
@@ -173,8 +190,12 @@ ggplot(hlab, aes(x = DO_percent, y = pH)) +
 
 # Challenges
 
-1.  getting the glm() to work. The first time I tried to run it it gave me this crazy warning message (Warning in dpois(y, mu, log = TRUE) : non-integer x = 1.140000) and I figured out that it gave me that because I was trying to use the poisson distribution with a predictor variable that is not whole numbers. I'm still not sure which distribution I'm supposed to be using.
-2.  getting my data set up for this. holy cow the original data sets were all in different spreadsheets and I had to go through them all and manually separate out the date and time columns that were originally lumped together because the hydrolab we used exports the data in a weird way.
+1.  Getting the glm() to work. The first time I tried to run it it gave me this crazy warning message (Warning in dpois(y, mu, log = TRUE) : non-integer x = 1.140000) and I figured out that it gave me that because I was trying to use the poisson distribution with a predictor variable that is not whole numbers. I switched to using a gaussian distribution and it looks like its working.
+2.  Getting my data set up for this. I had to go through them all and manually separate out the date and time columns that were originally lumped together because the hydrolab we used exports the data in a weird way.
 3.  Unfortunately, as much as I would have liked to run a time series analysis for dissolved oxygen and month, I chose not to so that I don't go crazy.
 
 ## Work Cited
+
+Fondriest Environmental, Inc. “pH of Water.” Fundamentals of Environmental Measurements. 19 Nov. 2013. https://www.fondriest.com/environmental-measurements/parameters/water-quality/ph/
+
+Heller, L. "EFFECTS OF INVASIVE SPECIES ON WATER QUALITY IN FRESHWATER ECOSYSTEMS." Soka University. 2020. <https://www.soka.edu/creative-coexistence>
