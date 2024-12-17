@@ -175,7 +175,7 @@ anova(hlab_mod)
 summary(hlab_mod)
 ```
 
-The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p \<2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality (Fondriest Environmental Inc., 2013).
+The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p <2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality (Fondriest Environmental Inc., 2013).
 
 Final plot
 
