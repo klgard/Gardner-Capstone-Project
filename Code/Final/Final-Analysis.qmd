@@ -80,6 +80,7 @@ Check assumptions
 ```{r}
 autoplot(anova_glm)
 ```
+
 The normal Q-Q plot looks a little funky towards the bottom, but that could still be due to the left skew in some of the data.
 
 Get the ANOVA and summary tables
@@ -91,17 +92,20 @@ anova(anova_glm, test = "Chisq")
 ```{r}
 summary(anova_glm)
 ```
-Based on the ANOVA, a little less than half of the variance in the data is explained by month. The intercept is 6.040, which biologically makes sense because its on the lower end of what we measured. However, the residual deviance in the summary table is relatively high aligning with the fact that not much of the. variation in the data is explained by month. We do have some sort of significant difference between months, so I need to run a Tukey HSD test. 
+
+Based on the ANOVA, a little less than half of the variance in the data is explained by month. The intercept is 6.040, which biologically makes sense because its on the lower end of what we measured. However, the residual deviance in the summary table is relatively high aligning with the fact that not much of the. variation in the data is explained by month. We do have some sort of significant difference between months, so I need to run a Tukey HSD test.
 
 Tukey HSD
+
 ```{r}
 phc1 <- glht(anova_glm, linfct = mcp(Month = "Tukey"))
 cld(phc1) # went right to the compact letter display because it's way easier to read
 ```
-According to the Tukey test, dissolved oxygen in October is significantly higher than in the earlier months, opposite of what I predicted. Also, July is significantly lower than June, September, and October and there is no significant difference between June and September. The sampling rate and duration increased in September and October, which could have contributed to the higher DO in October. I believe that more consistent sampling methods over a longer period of time would show the expected results. 
-Another explanation for the unexpected results could be that removing most of the water chestnut in July and August had a significant impact on the dissolved oxygen concentration in the water. It could be that we saw higher dissolved oxygen concentrations in October because it was the farthest from when most of the chestnut was removed. 
 
-Final Graph 
+According to the Tukey test, dissolved oxygen in October is significantly higher than in the earlier months, opposite of what I predicted. Also, July is significantly lower than June, September, and October and there is no significant difference between June and September. The sampling rate and duration increased in September and October, which could have contributed to the higher DO in October. I believe that more consistent sampling methods over a longer period of time would show the expected results. Another explanation for the unexpected results could be that removing most of the water chestnut in July and August had a significant impact on the dissolved oxygen concentration in the water. It could be that we saw higher dissolved oxygen concentrations in October because it was the farthest from when most of the chestnut was removed.
+
+Final Graph
+
 ```{r}
 ggplot(hlab, aes(x = Month, y = DO_mgl, color = Month)) + 
   geom_point(size = 1, alpha = 0.5) + 
@@ -120,7 +124,6 @@ ggplot(hlab, aes(x = Month, y = DO_mgl, color = Month)) +
                                                    "October"), 
            label = c("a", "b", "a", "c"))
 ```
-
 
 ## Linear Regression: Testing for a relationship between Dissolved oxygen and pH
 
@@ -175,7 +178,7 @@ anova(hlab_mod)
 summary(hlab_mod)
 ```
 
-The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p <2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality (Fondriest Environmental Inc., 2013).
+The slope is significantly different from zero, indicating that we should reject the null hypothesis (F = 1466 and 1 on 1712 DF and p \<2.2e-16). pH does significantly increase as dissolved oxygen increases. However, the adjusted R-squared value is 0.4609, which indicates a weaker correlation. This makes sense because decreases in dissolved oxygen do not directly cause a decrease in pH, but lower pH and lower dissolved oxygen are both generally associated with lower water quality (Fondriest Environmental Inc., 2013).
 
 Final plot
 
